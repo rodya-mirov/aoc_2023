@@ -14,15 +14,21 @@ pub fn a() -> String {
 }
 
 fn a_with_input(input: &str) -> usize {
-    input.lines().map(a_one_game).filter(|(_id, is_valid)| *is_valid).map(|(id, _)| id).sum()
+    input
+        .lines()
+        .map(a_one_game)
+        .filter(|(_id, is_valid)| *is_valid)
+        .map(|(id, _)| id)
+        .sum()
 }
 
 /// Returns (id, is_valid) for the parsed game
 fn a_one_game(input: &str) -> (usize, bool) {
     let game_record = parse_game(input);
-    let is_valid = game_record.pulls.iter().all(|p| {
-        p.num_red <= 12 && p.num_green <= 13 && p.num_blue <= 14
-    });
+    let is_valid = game_record
+        .pulls
+        .iter()
+        .all(|p| p.num_red <= 12 && p.num_green <= 13 && p.num_blue <= 14);
     (game_record.id, is_valid)
 }
 
@@ -172,11 +178,31 @@ mod tests {
     #[test]
     fn a_samples() {
         let fixtures = [
-            ("Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green", 1, true),
-            ("Game 2: 1 blue, 2 green; 3 green, 4 blue, 1 red; 1 green, 1 blue", 2, true),
-            ("Game 3: 8 green, 6 blue, 20 red; 5 blue, 4 red, 13 green; 5 green, 1 red", 3, false),
-            ("Game 4: 1 green, 3 red, 6 blue; 3 green, 6 red; 3 green, 15 blue, 14 red", 4, false),
-            ("Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green", 5, true)
+            (
+                "Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green",
+                1,
+                true,
+            ),
+            (
+                "Game 2: 1 blue, 2 green; 3 green, 4 blue, 1 red; 1 green, 1 blue",
+                2,
+                true,
+            ),
+            (
+                "Game 3: 8 green, 6 blue, 20 red; 5 blue, 4 red, 13 green; 5 green, 1 red",
+                3,
+                false,
+            ),
+            (
+                "Game 4: 1 green, 3 red, 6 blue; 3 green, 6 red; 3 green, 15 blue, 14 red",
+                4,
+                false,
+            ),
+            (
+                "Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green",
+                5,
+                true,
+            ),
         ];
 
         for (input, id, valid) in fixtures {
@@ -193,10 +219,19 @@ mod tests {
     fn b_samples() {
         let fixtures = [
             ("Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green", 48),
-            ("Game 2: 1 blue, 2 green; 3 green, 4 blue, 1 red; 1 green, 1 blue", 12),
-            ("Game 3: 8 green, 6 blue, 20 red; 5 blue, 4 red, 13 green; 5 green, 1 red", 1560),
-            ("Game 4: 1 green, 3 red, 6 blue; 3 green, 6 red; 3 green, 15 blue, 14 red", 630),
-            ("Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green", 36)
+            (
+                "Game 2: 1 blue, 2 green; 3 green, 4 blue, 1 red; 1 green, 1 blue",
+                12,
+            ),
+            (
+                "Game 3: 8 green, 6 blue, 20 red; 5 blue, 4 red, 13 green; 5 green, 1 red",
+                1560,
+            ),
+            (
+                "Game 4: 1 green, 3 red, 6 blue; 3 green, 6 red; 3 green, 15 blue, 14 red",
+                630,
+            ),
+            ("Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green", 36),
         ];
 
         for (input, exp) in fixtures {
