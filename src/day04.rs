@@ -1,10 +1,10 @@
-use std::collections::HashMap;
 use nom::bytes::complete::tag;
 use nom::character::complete::{digit1, space1};
 use nom::combinator::{eof, map};
-use nom::IResult;
 use nom::multi::separated_list1;
 use nom::sequence::tuple;
+use nom::IResult;
+use std::collections::HashMap;
 
 const INPUT_FILE: &'static str = "input/04.txt";
 
@@ -37,15 +37,17 @@ fn b_with_input(input: &str) -> usize {
 
     let mut value_cache = HashMap::new();
 
-    for i in (0 .. cards.len()).rev() {
+    for i in (0..cards.len()).rev() {
         let card = &cards[i];
         let num_wins = card.num_wins() as usize;
 
         // you always keep the card itself; plus anything you win (transitively)
         let mut card_value = 1;
 
-        for j in (i+1) ..= (i+num_wins) {
-            card_value += value_cache.get(&j).expect("Iteration order should guarantee the value cache is populated");
+        for j in (i + 1)..=(i + num_wins) {
+            card_value += value_cache
+                .get(&j)
+                .expect("Iteration order should guarantee the value cache is populated");
         }
 
         value_cache.insert(i, card_value);
@@ -56,7 +58,6 @@ fn b_with_input(input: &str) -> usize {
 }
 
 fn parse_line(input: &str) -> GameCard {
-
     fn parse_helper(input: &str) -> IResult<&str, GameCard> {
         let mut parse_num = map(digit1, |d: &str| d.parse::<u64>().unwrap());
 
@@ -69,9 +70,14 @@ fn parse_line(input: &str) -> GameCard {
 
         let (_, _) = eof(input)?;
 
-        Ok(("", GameCard {
-            id, winning_numbers, actual_numbers
-        }))
+        Ok((
+            "",
+            GameCard {
+                id,
+                winning_numbers,
+                actual_numbers,
+            },
+        ))
     }
 
     let (_, out) = parse_helper(input).unwrap();
@@ -82,7 +88,7 @@ fn parse_line(input: &str) -> GameCard {
 struct GameCard {
     id: u64,
     winning_numbers: Vec<u64>,
-    actual_numbers: Vec<u64>
+    actual_numbers: Vec<u64>,
 }
 
 impl GameCard {
