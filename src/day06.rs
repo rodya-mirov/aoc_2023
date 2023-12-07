@@ -40,6 +40,28 @@ impl Race {
             .filter(|total_dist| *total_dist > self.record)
             .count()
     }
+
+    fn num_solutions_fast(&self) -> usize {
+        // distance is D = (T - C) * C = -C^2 + TC; C is the variable of interest
+        // you want to know where D > R; or equivalently, where -C^2 + TC - R > 0
+
+        // so find the roots with the quadratic formula
+        let t: f64 = self.time as f64;
+        let r: f64 = self.record as f64;
+
+        // roots are ( t \pm sqrt(t^2 - 4*r) ) / 2
+        let disc: f64 = (t*t - 4.0*r).sqrt();
+
+        assert!(disc >= 0.0);
+
+        let lesser: f64 = (t - disc) / 2.0;
+        let greater: f64 = (t + disc) / 2.0;
+
+        let min_soln: usize = lesser.ceil() as usize;
+        let max_soln: usize = greater.floor() as usize;
+
+        (max_soln - min_soln) + 1
+    }
 }
 
 fn parse_input_a(input: &str) -> Vec<Race> {
@@ -92,7 +114,7 @@ pub fn b() -> String {
 
 fn b_with_input(input: &str) -> usize {
     let race = parse_input_b(input);
-    race.num_solutions()
+    race.num_solutions_fast()
 }
 
 #[cfg(test)]
