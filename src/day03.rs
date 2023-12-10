@@ -1,4 +1,4 @@
-use std::collections::HashSet;
+use ahash::HashSet;
 
 const INPUT_FILE: &'static str = "input/03.txt";
 
@@ -99,7 +99,7 @@ fn b_with_input(input: &str) -> u64 {
 
     for (row_ind, line) in input.lines().enumerate() {
         let mut is_running = false;
-        let mut adj_gears: HashSet<usize> = HashSet::new();
+        let mut adj_gears: HashSet<usize> = HashSet::default();
         let mut running_total = 0;
 
         for (col_ind, c) in line.chars().enumerate() {

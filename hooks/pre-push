@@ -1,0 +1,17 @@
+#!/bin/zsh
+
+if [[ $(git diff) ]]; then
+  echo "You have unstaged changes; please stage all changes before pushing code."
+  exit 1
+fi
+
+if [[ $(git diff --cached) ]]; then
+  echo "You have uncommitted changes; please commit all changes before pushing code."
+  exit 1
+fi
+
+set -e
+
+cargo fmt --check
+
+cargo test

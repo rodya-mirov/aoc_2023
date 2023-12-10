@@ -1,10 +1,10 @@
+use ahash::HashMap;
 use nom::bytes::complete::tag;
 use nom::character::complete::{digit1, space1};
 use nom::combinator::{eof, map};
 use nom::multi::separated_list1;
 use nom::sequence::tuple;
 use nom::IResult;
-use std::collections::HashMap;
 
 const INPUT_FILE: &'static str = "input/04.txt";
 
@@ -35,7 +35,7 @@ fn b_with_input(input: &str) -> usize {
 
     let mut out = 0;
 
-    let mut value_cache = HashMap::new();
+    let mut value_cache = HashMap::default();
 
     for i in (0..cards.len()).rev() {
         let card = &cards[i];

@@ -1,9 +1,9 @@
 use nom::bytes::complete::tag;
 use nom::character::complete::{digit1, space1};
 use nom::combinator::{eof, map};
-use nom::IResult;
 use nom::multi::separated_list1;
 use nom::sequence::tuple;
+use nom::IResult;
 
 const INPUT_FILE: &'static str = "input/06.txt";
 
@@ -35,7 +35,7 @@ struct Race {
 
 impl Race {
     fn num_solutions(&self) -> usize {
-        (0 ..= self.time)
+        (0..=self.time)
             .map(|charge_time| distance(self.time, charge_time))
             .filter(|total_dist| *total_dist > self.record)
             .count()
@@ -50,7 +50,7 @@ impl Race {
         let r: f64 = self.record as f64;
 
         // roots are ( t \pm sqrt(t^2 - 4*r) ) / 2
-        let disc: f64 = (t*t - 4.0*r).sqrt();
+        let disc: f64 = (t * t - 4.0 * r).sqrt();
 
         assert!(disc >= 0.0);
 
@@ -67,24 +67,33 @@ impl Race {
 fn parse_input_a(input: &str) -> Vec<Race> {
     fn parse_line<'a>(input: &'a str, str_tag: &str) -> IResult<&'a str, Vec<u64>> {
         let (input, _) = tuple((tag(str_tag), tag(":"), space1))(input)?;
-        let (input, nums) = separated_list1(space1, map(digit1, |d: &str| d.parse::<u64>().unwrap()))(input)?;
+        let (input, nums) =
+            separated_list1(space1, map(digit1, |d: &str| d.parse::<u64>().unwrap()))(input)?;
         let (_, _) = eof(input)?;
         Ok(("", nums))
     }
 
     let mut line_iter = input.lines();
-    let (_, times) = line_iter.next().map(|line| parse_line(line, "Time")).expect("First line should exist").expect("First line should parse");
-    let (_, records) = line_iter.next().map(|line| parse_line(line, "Distance")).expect("Second line should exist").expect("Second line should parse");
+    let (_, times) = line_iter
+        .next()
+        .map(|line| parse_line(line, "Time"))
+        .expect("First line should exist")
+        .expect("First line should parse");
+    let (_, records) = line_iter
+        .next()
+        .map(|line| parse_line(line, "Distance"))
+        .expect("Second line should exist")
+        .expect("Second line should parse");
     assert_eq!(line_iter.next(), None);
 
     assert_eq!(times.len(), records.len());
 
     let mut out = Vec::new();
 
-    for i in 0 .. times.len() {
+    for i in 0..times.len() {
         out.push(Race {
             time: times[i],
-            record: records[i]
+            record: records[i],
         });
     }
 
@@ -92,7 +101,7 @@ fn parse_input_a(input: &str) -> Vec<Race> {
 }
 
 fn parse_input_b(input: &str) -> Race {
-    fn parse_line<'a>(input: &'a str, str_tag: &str) -> IResult<&'a str,u64> {
+    fn parse_line<'a>(input: &'a str, str_tag: &str) -> IResult<&'a str, u64> {
         let (input, _) = tuple((tag(str_tag), tag(":"), space1))(input)?;
         let joined: String = input.chars().filter(|c| !c.is_ascii_whitespace()).collect();
         let num: u64 = joined.parse().unwrap();
@@ -100,8 +109,16 @@ fn parse_input_b(input: &str) -> Race {
     }
 
     let mut line_iter = input.lines();
-    let (_, time) = line_iter.next().map(|line| parse_line(line, "Time")).expect("First line should exist").expect("First line should parse");
-    let (_, record) = line_iter.next().map(|line| parse_line(line, "Distance")).expect("Second line should exist").expect("Second line should parse");
+    let (_, time) = line_iter
+        .next()
+        .map(|line| parse_line(line, "Time"))
+        .expect("First line should exist")
+        .expect("First line should parse");
+    let (_, record) = line_iter
+        .next()
+        .map(|line| parse_line(line, "Distance"))
+        .expect("Second line should exist")
+        .expect("Second line should parse");
     assert_eq!(line_iter.next(), None);
 
     Race { time, record }

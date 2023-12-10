@@ -9,7 +9,11 @@ fn a_with_input(input: &str) -> usize {
     let mut hands: Vec<_> = input.lines().map(|line| part_a::parse_line(line)).collect();
     hands.sort();
 
-    let total: usize = hands.iter().enumerate().map(|(rank, (_, bid))| (rank + 1) * bid).sum();
+    let total: usize = hands
+        .iter()
+        .enumerate()
+        .map(|(rank, (_, bid))| (rank + 1) * bid)
+        .sum();
 
     total
 }
@@ -23,20 +27,23 @@ fn b_with_input(input: &str) -> usize {
     let mut hands: Vec<_> = input.lines().map(|line| part_b::parse_line(line)).collect();
     hands.sort();
 
-    let total: usize = hands.iter().enumerate().map(|(rank, (_, bid))| (rank + 1) * bid).sum();
+    let total: usize = hands
+        .iter()
+        .enumerate()
+        .map(|(rank, (_, bid))| (rank + 1) * bid)
+        .sum();
 
     total
 }
 
-
 // honestly, not much can be shared between the two ...
 mod part_a {
-    use std::collections::HashMap;
+    use ahash::HashMap;
 
     #[derive(Eq, PartialEq, Copy, Clone, Ord, PartialOrd, Hash)]
     pub struct TypedHand {
         pub kind: HandType,
-        pub cards: [Card; 5]
+        pub cards: [Card; 5],
     }
 
     #[derive(Eq, PartialEq, Copy, Clone, Ord, PartialOrd, Hash)]
@@ -48,7 +55,7 @@ mod part_a {
         ThreeOfAKind,
         FullHouse,
         FourOfAKind,
-        FiveOfAKind
+        FiveOfAKind,
     }
 
     #[derive(Eq, PartialEq, Copy, Clone, Ord, PartialOrd, Hash)]
@@ -66,7 +73,7 @@ mod part_a {
         J,
         Q,
         K,
-        A
+        A,
     }
 
     impl TryFrom<char> for Card {
@@ -95,7 +102,7 @@ mod part_a {
     }
 
     fn mult_map(cards: &[Card]) -> HashMap<Card, usize> {
-        let mut out = HashMap::new();
+        let mut out = HashMap::default();
 
         for c in cards.iter().copied() {
             *out.entry(c).or_insert(0) += 1;
@@ -134,11 +141,17 @@ mod part_a {
     pub fn parse_line(input: &str) -> (TypedHand, usize) {
         let mut chars = input.chars();
 
-        fn next_card<T: Iterator<Item=char>>(chars: &mut T) -> Card {
+        fn next_card<T: Iterator<Item = char>>(chars: &mut T) -> Card {
             chars.next().unwrap().try_into().unwrap()
         }
 
-        let cards: [Card; 5] = [next_card(&mut chars), next_card(&mut chars), next_card(&mut chars), next_card(&mut chars), next_card(&mut chars), ];
+        let cards: [Card; 5] = [
+            next_card(&mut chars),
+            next_card(&mut chars),
+            next_card(&mut chars),
+            next_card(&mut chars),
+            next_card(&mut chars),
+        ];
         let kind: HandType = hand_type(cards);
 
         assert_eq!(chars.next(), Some(' '));
@@ -151,14 +164,13 @@ mod part_a {
     }
 }
 
-
 mod part_b {
-    use std::collections::HashMap;
+    use ahash::HashMap;
 
     #[derive(Eq, PartialEq, Copy, Clone, Ord, PartialOrd, Hash)]
     pub struct TypedHand {
         pub kind: HandType,
-        pub cards: [Card; 5]
+        pub cards: [Card; 5],
     }
 
     #[derive(Eq, PartialEq, Copy, Clone, Ord, PartialOrd, Hash, Debug)]
@@ -170,7 +182,7 @@ mod part_b {
         ThreeOfAKind,
         FullHouse,
         FourOfAKind,
-        FiveOfAKind
+        FiveOfAKind,
     }
 
     #[derive(Eq, PartialEq, Copy, Clone, Ord, PartialOrd, Hash)]
@@ -189,7 +201,7 @@ mod part_b {
         T,
         Q,
         K,
-        A
+        A,
     }
 
     impl TryFrom<char> for Card {
@@ -216,7 +228,7 @@ mod part_b {
     }
 
     fn mult_map(cards: &[Card]) -> HashMap<Card, usize> {
-        let mut out = HashMap::new();
+        let mut out = HashMap::default();
 
         for c in cards.iter().copied() {
             *out.entry(c).or_insert(0) += 1;
@@ -227,7 +239,11 @@ mod part_b {
 
     fn hand_type(cards: [Card; 5]) -> HandType {
         let card_mults = mult_map(&cards);
-        let mut orders: Vec<usize> = card_mults.iter().filter(|(&c, _)| c != Card::J).map(|(_c, num)| *num).collect();
+        let mut orders: Vec<usize> = card_mults
+            .iter()
+            .filter(|(&c, _)| c != Card::J)
+            .map(|(_c, num)| *num)
+            .collect();
         orders.sort();
         orders.reverse();
 
@@ -238,7 +254,7 @@ mod part_b {
             HandType::FiveOfAKind
         } else if num_jokers == 3 {
             // if we have 3 wilds, and a pair, then it's a five of a kind; otherwise a four of a kind
-            if orders[0] ==2 {
+            if orders[0] == 2 {
                 HandType::FiveOfAKind
             } else {
                 HandType::FourOfAKind
@@ -303,11 +319,13 @@ mod part_b {
     pub fn parse_line(input: &str) -> (TypedHand, usize) {
         let mut chars = input.chars();
 
-        fn next_card<T: Iterator<Item=char>>(chars: &mut T) -> Card {
-            chars.next().unwrap().try_into().unwrap()
-        }
-
-        let hand_chars = [chars.next().unwrap(), chars.next().unwrap(), chars.next().unwrap(), chars.next().unwrap(), chars.next().unwrap(), ];
+        let hand_chars = [
+            chars.next().unwrap(),
+            chars.next().unwrap(),
+            chars.next().unwrap(),
+            chars.next().unwrap(),
+            chars.next().unwrap(),
+        ];
         let typed_hand = parse_hand(hand_chars);
 
         assert_eq!(chars.next(), Some(' '));
@@ -322,8 +340,8 @@ mod part_b {
 
 #[cfg(test)]
 mod tests {
-    use super::part_b::HandType as HandTypeB;
     use super::part_b::parse_hand as parse_b;
+    use super::part_b::HandType as HandTypeB;
     use super::*;
 
     const SAMPLE_A: &'static str = "32T3K 765
@@ -348,7 +366,10 @@ QQQJA 483";
 
         let act = parse_b(chars).kind;
 
-        assert_eq!(exp, act, "Input {input} should yield {exp:?} but got {act:?}");
+        assert_eq!(
+            exp, act,
+            "Input {input} should yield {exp:?} but got {act:?}"
+        );
     }
 
     #[test]
@@ -363,7 +384,7 @@ QQQJA 483";
             ("666JJ", FiveOfAKind),
             ("656JJ", FourOfAKind),
             ("JQK38", Pair),
-            ("JKQ2Q", ThreeOfAKind)
+            ("JKQ2Q", ThreeOfAKind),
         ] {
             hand_type_test_b(input, exp)
         }
