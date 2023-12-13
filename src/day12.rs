@@ -3,7 +3,6 @@ use nom::character::complete::{digit1, space1};
 use nom::combinator::{eof, map};
 use nom::multi::separated_list1;
 use nom::IResult;
-use std::collections::VecDeque;
 use time::Instant;
 
 const INPUT_FILE: &'static str = "input/12.txt";
@@ -59,14 +58,15 @@ fn num_arrangements(input: ParseResult) -> usize {
     // of Broken and NotBroken
     fn count_solutions_rec(
         cells: &mut [ParsedCell],
-        damaged_counts: &mut VecDeque<usize>,
-        next_ind: usize,
-        remaining_budget: usize,
+        // REVERSED: so the LAST one is the next one that needs to be achieved
+        damaged_counts: &mut Vec<usize>,
         current_run: usize,
     ) -> usize {
-        if next_ind == cells.len() {
+        if cells.is_empty() {
             return if current_run > 0 {
-                if damaged_counts.len() == 1 && damaged_counts.get(0) == Some(&current_run) {
+                if damaged_counts.len() == 1
+                    && damaged_counts.get(damaged_counts.len() - 1) == Some(&current_run)
+                {
                     1
                 } else {
                     0
@@ -80,90 +80,65 @@ fn num_arrangements(input: ParseResult) -> usize {
             };
         }
 
-        if remaining_budget > cells.len() - next_ind {
-            return 0;
-        }
-
-        match cells[next_ind] {
+        match cells[0] {
             ParsedCell::Unknown => {
                 let mut total = 0;
 
                 // try operational?
-                cells[next_ind] = ParsedCell::Operational;
-                total += count_solutions_rec(
-                    cells,
-                    damaged_counts,
-                    next_ind,
-                    remaining_budget,
-                    current_run,
-                );
+                cells[0] = ParsedCell::Operational;
+                total += count_solutions_rec(cells, damaged_counts, current_run);
 
                 // try damaged?
-                if remaining_budget > 0 && !damaged_counts.is_empty() {
-                    let next_run = damaged_counts.get(0).copied().unwrap();
+                if !damaged_counts.is_empty() {
+                    let next_run = damaged_counts
+                        .get(damaged_counts.len() - 1)
+                        .copied()
+                        .unwrap();
                     if next_run > current_run {
-                        cells[next_ind] = ParsedCell::Damaged;
-                        total += count_solutions_rec(
-                            cells,
-                            damaged_counts,
-                            next_ind,
-                            remaining_budget - 1,
-                            current_run,
-                        );
+                        cells[0] = ParsedCell::Damaged;
+                        total += count_solutions_rec(cells, damaged_counts, current_run);
                     }
                 }
 
                 // put the array back how we found it
-                cells[next_ind] = ParsedCell::Unknown;
+                cells[0] = ParsedCell::Unknown;
 
                 total
             }
             ParsedCell::Operational => {
                 if current_run > 0 {
-                    if damaged_counts.get(0) != Some(&current_run) {
+                    if damaged_counts.get(damaged_counts.len() - 1) != Some(&current_run) {
                         return 0;
                     }
 
-                    damaged_counts.pop_front();
-                    let total = count_solutions_rec(
-                        cells,
-                        damaged_counts,
-                        next_ind + 1,
-                        remaining_budget,
-                        0,
-                    );
-                    damaged_counts.push_front(current_run);
+                    damaged_counts.pop();
+                    let total = count_solutions_rec(&mut cells[1..], damaged_counts, 0);
+                    damaged_counts.push(current_run);
                     total
                 } else {
-                    count_solutions_rec(cells, damaged_counts, next_ind + 1, remaining_budget, 0)
+                    count_solutions_rec(&mut cells[1..], damaged_counts, 0)
                 }
             }
             ParsedCell::Damaged => {
                 // increment the current run and move on to the next thing
                 if damaged_counts.is_empty()
-                    || damaged_counts.get(0).copied().unwrap() <= current_run
+                    || damaged_counts
+                        .get(damaged_counts.len() - 1)
+                        .copied()
+                        .unwrap()
+                        <= current_run
                 {
                     return 0;
                 }
 
-                count_solutions_rec(
-                    cells,
-                    damaged_counts,
-                    next_ind + 1,
-                    remaining_budget,
-                    current_run + 1,
-                )
+                count_solutions_rec(&mut cells[1..], damaged_counts, current_run + 1)
             }
         }
     }
 
-    let required_damage: usize = damaged_counts.iter().copied().sum();
-    let known_damage = cells.iter().filter(|&&c| c == ParsedCell::Damaged).count();
-    let budget = required_damage - known_damage;
+    let mut runs_reversed: Vec<usize> = damaged_counts.iter().copied().rev().collect();
 
-    let mut dc_vd: VecDeque<usize> = damaged_counts.iter().copied().collect();
-
-    count_solutions_rec(&mut cells.clone(), &mut dc_vd, 0, budget, 0)
+    count_solutions_rec(&mut cells.clone(), &mut runs_reversed, 0)
 }
 
 #[derive(Copy, Clone, Eq, PartialEq, Hash, Debug)]
