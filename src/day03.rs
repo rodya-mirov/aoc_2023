@@ -1,6 +1,6 @@
 use ahash::HashSet;
 
-const INPUT_FILE: &'static str = "input/03.txt";
+const INPUT_FILE: &str = "input/03.txt";
 
 pub fn a() -> String {
     let input = std::fs::read_to_string(INPUT_FILE).expect("Input should exist");
@@ -13,20 +13,16 @@ fn a_with_input(input: &str) -> u64 {
         // go through each line and collect all the coordinates of special characters ...
         .lines()
         .enumerate()
-        .map(|(row_ind, line)| {
+        .flat_map(|(row_ind, line)| {
             line.chars()
                 .enumerate()
                 .filter(|&(_, c)| !c.is_alphanumeric() && !(c == '.'))
                 .map(move |(col_ind, _)| (row_ind as i32, col_ind as i32))
         })
-        .flatten()
         // ... then for each coordinate of same, emit every coordinate adjacent to any of those ...
-        .map(|(row, col)| {
-            (-1..=1)
-                .map(move |dx| (-1..=1).map(move |dy| (row + dy, col + dx)))
-                .flatten()
+        .flat_map(|(row, col)| {
+            (-1..=1).flat_map(move |dx| (-1..=1).map(move |dy| (row + dy, col + dx)))
         })
-        .flatten()
         .filter(|&(row, col)| row >= 0 && col >= 0)
         .map(|(row, col)| (row as usize, col as usize))
         // ... and collection the result as a hashset
@@ -76,18 +72,16 @@ fn b_with_input(input: &str) -> u64 {
         // go through each line and collect all the coordinates of gears ...
         .lines()
         .enumerate()
-        .map(|(row_ind, line)| {
+        .flat_map(|(row_ind, line)| {
             line.chars()
                 .enumerate()
                 .filter(|&(_, c)| c == '*')
                 .map(move |(col_ind, _)| (row_ind as i32, col_ind as i32))
         })
-        .flatten()
         // ... then for each coordinate of same, emit every coordinate adjacent to any of those ...
         .map(|(row, col)| {
             (-1..=1)
-                .map(move |dx| (-1..=1).map(move |dy| (row + dy, col + dx)))
-                .flatten()
+                .flat_map(move |dx| (-1..=1).map(move |dy| (row + dy, col + dx)))
                 .filter(|&(r, c)| r >= 0 && c >= 0)
                 .map(|(r, c)| (r as usize, c as usize))
                 .collect::<HashSet<_>>()

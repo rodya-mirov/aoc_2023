@@ -5,7 +5,7 @@ use nom::multi::separated_list1;
 use nom::IResult;
 use time::Instant;
 
-const INPUT_FILE: &'static str = "input/12.txt";
+const INPUT_FILE: &str = "input/12.txt";
 
 pub fn a() -> String {
     let input = std::fs::read_to_string(INPUT_FILE).expect("Input should exist");
@@ -64,9 +64,7 @@ fn num_arrangements(input: ParseResult) -> usize {
     ) -> usize {
         if cells.is_empty() {
             return if current_run > 0 {
-                if damaged_counts.len() == 1
-                    && damaged_counts.get(damaged_counts.len() - 1) == Some(&current_run)
-                {
+                if damaged_counts.len() == 1 && damaged_counts.last() == Some(&current_run) {
                     1
                 } else {
                     0
@@ -90,10 +88,7 @@ fn num_arrangements(input: ParseResult) -> usize {
 
                 // try damaged?
                 if !damaged_counts.is_empty() {
-                    let next_run = damaged_counts
-                        .get(damaged_counts.len() - 1)
-                        .copied()
-                        .unwrap();
+                    let next_run = damaged_counts.last().copied().unwrap();
                     if next_run > current_run {
                         cells[0] = ParsedCell::Damaged;
                         total += count_solutions_rec(cells, damaged_counts, current_run);
@@ -107,7 +102,7 @@ fn num_arrangements(input: ParseResult) -> usize {
             }
             ParsedCell::Operational => {
                 if current_run > 0 {
-                    if damaged_counts.get(damaged_counts.len() - 1) != Some(&current_run) {
+                    if damaged_counts.last() != Some(&current_run) {
                         return 0;
                     }
 
@@ -122,11 +117,7 @@ fn num_arrangements(input: ParseResult) -> usize {
             ParsedCell::Damaged => {
                 // increment the current run and move on to the next thing
                 if damaged_counts.is_empty()
-                    || damaged_counts
-                        .get(damaged_counts.len() - 1)
-                        .copied()
-                        .unwrap()
-                        <= current_run
+                    || damaged_counts.last().copied().unwrap() <= current_run
                 {
                     return 0;
                 }

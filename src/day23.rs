@@ -1,4 +1,4 @@
-const INPUT_FILE: &'static str = "input/23.txt";
+const INPUT_FILE: &str = "input/23.txt";
 
 pub fn a() -> String {
     let input = std::fs::read_to_string(INPUT_FILE).expect("Input should exist");

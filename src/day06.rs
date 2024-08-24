@@ -5,7 +5,7 @@ use nom::multi::separated_list1;
 use nom::sequence::tuple;
 use nom::IResult;
 
-const INPUT_FILE: &'static str = "input/06.txt";
+const INPUT_FILE: &str = "input/06.txt";
 
 pub fn a() -> String {
     let input = std::fs::read_to_string(INPUT_FILE).expect("Input should exist");

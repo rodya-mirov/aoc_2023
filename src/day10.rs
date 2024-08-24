@@ -1,7 +1,7 @@
 use ahash::{HashMap, HashSet};
 use std::collections::VecDeque;
 
-const INPUT_FILE: &'static str = "input/10.txt";
+const INPUT_FILE: &str = "input/10.txt";
 
 pub fn a() -> String {
     let input = std::fs::read_to_string(INPUT_FILE).expect("Input should exist");
@@ -131,7 +131,7 @@ fn b_with_input(input: &str) -> usize {
 
             for next_node in vec![node.left(), node.right(), node.up(), node.down()]
                 .into_iter()
-                .filter_map(|n| n)
+                .flatten()
             {
                 if next_node.x < big_width
                     && next_node.y < big_height

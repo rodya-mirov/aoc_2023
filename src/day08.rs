@@ -6,7 +6,7 @@ use nom::character::complete::alphanumeric1;
 use nom::combinator::eof;
 use nom::IResult;
 
-const INPUT_FILE: &'static str = "input/08.txt";
+const INPUT_FILE: &str = "input/08.txt";
 
 pub fn a() -> String {
     let input = std::fs::read_to_string(INPUT_FILE).expect("Input should exist");
@@ -150,7 +150,7 @@ fn find_target_times(
 
 fn lcm(a: i128, b: i128) -> i128 {
     let g = ring_algorithm::gcd(a, b);
-    return (a / g) * b;
+    (a / g) * b
 }
 
 fn b_with_input(input: &str) -> i128 {
@@ -236,7 +236,7 @@ fn b_with_input(input: &str) -> i128 {
 
         if let Some(found) = maybe_solution {
             // no guarantee that's remotely in the right modulus, for some reason; need to normalize it
-            let total_modulus = periods.iter().copied().fold(1, |a, b| lcm(a, b));
+            let total_modulus = periods.iter().copied().fold(1, lcm);
             let soln = found.rem_euclid(total_modulus);
 
             best_solution = best_solution.min(soln);
@@ -249,7 +249,7 @@ fn b_with_input(input: &str) -> i128 {
     }
 
     // don't forget the offset we skipped at the beginning
-    return best_solution + (max_offset as i128);
+    best_solution + (max_offset as i128)
 }
 
 #[derive(Copy, Clone, Eq, PartialEq, Debug, Hash)]

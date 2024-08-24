@@ -1,4 +1,4 @@
-const INPUT_FILE: &'static str = "input/07.txt";
+const INPUT_FILE: &str = "input/07.txt";
 
 pub fn a() -> String {
     let input = std::fs::read_to_string(INPUT_FILE).expect("Input should exist");
@@ -6,7 +6,7 @@ pub fn a() -> String {
 }
 
 fn a_with_input(input: &str) -> usize {
-    let mut hands: Vec<_> = input.lines().map(|line| part_a::parse_line(line)).collect();
+    let mut hands: Vec<_> = input.lines().map(part_a::parse_line).collect();
     hands.sort();
 
     let total: usize = hands
@@ -24,7 +24,7 @@ pub fn b() -> String {
 }
 
 fn b_with_input(input: &str) -> usize {
-    let mut hands: Vec<_> = input.lines().map(|line| part_b::parse_line(line)).collect();
+    let mut hands: Vec<_> = input.lines().map(part_b::parse_line).collect();
     hands.sort();
 
     let total: usize = hands

@@ -5,7 +5,7 @@ use nom::multi::separated_list1;
 use nom::sequence::tuple;
 use nom::IResult;
 
-const INPUT_FILE: &'static str = "input/05.txt";
+const INPUT_FILE: &str = "input/05.txt";
 
 pub fn a() -> String {
     let input = std::fs::read_to_string(INPUT_FILE).expect("Input should exist");
@@ -233,7 +233,7 @@ fn unify_intervals(mut intervals: Vec<Interval>) -> Vec<Interval> {
 
     let mut out = Vec::new();
 
-    while let Some(next) = iter.next() {
+    for next in iter {
         assert!(running.start <= next.start);
 
         if running.end < next.start {
@@ -335,9 +335,7 @@ struct Mapping {
 
 impl Mapping {
     fn resolve(&self, input: usize) -> Option<usize> {
-        if input < self.source_start {
-            None
-        } else if input >= self.source_end {
+        if input < self.source_start || input >= self.source_end {
             None
         } else {
             Some(input - self.source_start + self.target_start)

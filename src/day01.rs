@@ -1,4 +1,4 @@
-const INPUT_FILE: &'static str = "input/01.txt";
+const INPUT_FILE: &str = "input/01.txt";
 
 pub fn a() -> String {
     let input = std::fs::read_to_string(INPUT_FILE).expect("Input should exist");
@@ -6,7 +6,7 @@ pub fn a() -> String {
 }
 
 fn a_with_multi_input(input: &str) -> u64 {
-    input.lines().map(|line| a_with_input(line)).sum()
+    input.lines().map(a_with_input).sum()
 }
 
 fn a_with_input(input: &str) -> u64 {
@@ -14,7 +14,7 @@ fn a_with_input(input: &str) -> u64 {
     let mut last_char = '0';
     let mut set = false;
 
-    for c in input.chars().filter(|c| c.is_digit(10)) {
+    for c in input.chars().filter(|c| c.is_ascii_digit()) {
         if !set {
             set = true;
             first_char = c;
@@ -38,7 +38,7 @@ pub fn b() -> String {
 }
 
 fn b_with_multi_input(input: &str) -> u64 {
-    input.lines().map(|line| b_with_input(line)).sum()
+    input.lines().map(b_with_input).sum()
 }
 
 fn b_with_input(input: &str) -> u64 {
@@ -54,7 +54,7 @@ fn b_with_input(input: &str) -> u64 {
 
         let c = chars[ind];
 
-        if c.is_digit(10) {
+        if c.is_ascii_digit() {
             return Some(char_to_int(c));
         }
 
@@ -78,7 +78,7 @@ fn b_with_input(input: &str) -> u64 {
 
             let other_substr = &chars[ind..token_end];
 
-            if &token_chars == other_substr {
+            if token_chars == other_substr {
                 return Some(val);
             }
         }
